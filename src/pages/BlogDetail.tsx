@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CalendarDays, Clock3, UserRound } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { api, resolveAssetUrl, type BlogPost, type Product, type ProductListResponse } from "../lib/api";
+import { api, expectApiObject, expectProductListResponse, resolveAssetUrl, type BlogPost, type Product, type ProductListResponse } from "../lib/api";
 import { estimateReadingTime, formatDate, setPageMeta } from "../lib/utils";
 import BlogCard from "../components/BlogCard";
 import EmptyState from "../components/EmptyState";
@@ -18,7 +18,7 @@ export default function BlogDetail() {
     queryKey: ["blog", slug],
     queryFn: async () => {
       const response = await api.get<BlogPost>(`/blogs/${slug}`);
-      return response.data;
+      return expectApiObject<BlogPost>(response.data, `/blogs/${slug}`);
     },
     enabled: Boolean(slug),
   });
@@ -32,7 +32,7 @@ export default function BlogDetail() {
           sort: "popular",
         },
       });
-      return response.data.items.slice(0, 2);
+      return expectProductListResponse(response.data, "/products").items.slice(0, 2);
     },
   });
 

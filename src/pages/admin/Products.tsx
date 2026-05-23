@@ -6,7 +6,7 @@ import { productCategories } from "@shared/brand";
 import Button, { buttonStyles } from "../../components/Button";
 import EmptyState from "../../components/EmptyState";
 import Loader from "../../components/Loader";
-import { api, getApiErrorMessage, resolveAssetUrl, type Product } from "../../lib/api";
+import { api, expectApiArray, getApiErrorMessage, resolveAssetUrl, type Product } from "../../lib/api";
 import { formatCurrency, formatDate, setPageMeta } from "../../lib/utils";
 
 export default function AdminProducts() {
@@ -30,7 +30,7 @@ export default function AdminProducts() {
           status: status || undefined,
         },
       });
-      return response.data;
+      return expectApiArray<Product>(response.data, "/admin/products");
     },
   });
 

@@ -7,7 +7,7 @@ import EmptyState from "../components/EmptyState";
 import Loader from "../components/Loader";
 import ProductCard from "../components/ProductCard";
 import SectionHeader from "../components/SectionHeader";
-import { api, type ProductListResponse } from "../lib/api";
+import { api, expectProductListResponse, type ProductListResponse } from "../lib/api";
 import { setPageMeta } from "../lib/utils";
 import Button from "../components/Button";
 
@@ -58,7 +58,7 @@ export default function Products() {
         },
       });
 
-      return response.data;
+      return expectProductListResponse(response.data, "/products");
     },
   });
 

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { brand, homeFaqs, productCategories, trustPoints } from "@shared/brand";
-import { api, type BlogPost, type Product, type ProductListResponse } from "../lib/api";
+import { api, expectApiArray, expectProductListResponse, type BlogPost, type Product, type ProductListResponse } from "../lib/api";
 import { setPageMeta } from "../lib/utils";
 import { buttonStyles } from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
@@ -66,7 +66,7 @@ export default function Home() {
           sort: "popular",
         },
       });
-      return response.data.items.slice(0, 4);
+      return expectProductListResponse(response.data, "/products").items.slice(0, 4);
     },
   });
 
@@ -74,7 +74,7 @@ export default function Home() {
     queryKey: ["blogs", "home-preview"],
     queryFn: async () => {
       const response = await api.get<BlogPost[]>("/blogs");
-      return response.data.slice(0, 3);
+      return expectApiArray<BlogPost>(response.data, "/blogs").slice(0, 3);
     },
   });
 

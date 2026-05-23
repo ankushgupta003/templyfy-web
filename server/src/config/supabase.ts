@@ -7,6 +7,7 @@ export const supabaseAdmin =
         auth: {
           persistSession: false,
           autoRefreshToken: false,
+          detectSessionInUrl: false,
         },
       })
     : null;

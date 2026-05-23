@@ -178,10 +178,21 @@ Use these values in `.env`:
 ```env
 STORAGE_PROVIDER="supabase"
 SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="YOUR_SUPABASE_SERVICE_ROLE_KEY"
+SUPABASE_SERVICE_ROLE_KEY="YOUR_SUPABASE_SECRET_OR_SERVICE_ROLE_KEY"
 SUPABASE_PUBLIC_BUCKET="templyfy-public"
 SUPABASE_PRIVATE_BUCKET="templyfy-private"
 ```
+
+For `SUPABASE_SERVICE_ROLE_KEY`, use one of these from Supabase `Settings -> API Keys`:
+
+- recommended: a server-side `Secret key` starting with `sb_secret_`
+- acceptable: the legacy `service_role` key from the Legacy tab
+
+Do not use:
+
+- your database password
+- the publishable / anon key
+- the JWT signing secret
 
 How to access and manage your DB later:
 
@@ -232,7 +243,7 @@ CORS_ORIGINS="https://yourdomain.com,https://www.yourdomain.com"
 TRUST_PROXY="true"
 STORAGE_PROVIDER="supabase"
 SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="YOUR_SUPABASE_SERVICE_ROLE_KEY"
+SUPABASE_SERVICE_ROLE_KEY="YOUR_SUPABASE_SECRET_OR_SERVICE_ROLE_KEY"
 SUPABASE_PUBLIC_BUCKET="templyfy-public"
 SUPABASE_PRIVATE_BUCKET="templyfy-private"
 DOWNLOAD_TOKEN_SECRET="replace-with-a-long-random-secret"

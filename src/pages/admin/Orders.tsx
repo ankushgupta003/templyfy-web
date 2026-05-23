@@ -4,7 +4,7 @@ import { Search, Send, X } from "lucide-react";
 import Button from "../../components/Button";
 import EmptyState from "../../components/EmptyState";
 import Loader from "../../components/Loader";
-import { api, getApiErrorMessage, type AdminOrder } from "../../lib/api";
+import { api, expectApiArray, expectApiObject, getApiErrorMessage, type AdminOrder } from "../../lib/api";
 import { formatCurrency, formatDate, setPageMeta } from "../../lib/utils";
 
 const statusStyles: Record<AdminOrder["status"], string> = {
@@ -34,7 +34,7 @@ export default function AdminOrders() {
           status: status || undefined,
         },
       });
-      return response.data;
+      return expectApiArray<AdminOrder>(response.data, "/admin/orders");
     },
   });
 
@@ -42,7 +42,7 @@ export default function AdminOrders() {
     queryKey: ["admin", "order", selectedOrderId],
     queryFn: async () => {
       const response = await api.get<AdminOrder>(`/admin/orders/${selectedOrderId}`);
-      return response.data;
+      return expectApiObject<AdminOrder>(response.data, `/admin/orders/${selectedOrderId}`);
     },
     enabled: Boolean(selectedOrderId),
   });

@@ -40,6 +40,18 @@ const requireSupabase = () => {
   return supabaseAdmin;
 };
 
+const toStorageErrorMessage = (errorMessage: string) => {
+  if (errorMessage.includes("Invalid Compact JWS")) {
+    return [
+      "Storage upload failed because Supabase server credentials are invalid.",
+      "Check SUPABASE_SERVICE_ROLE_KEY in your environment.",
+      "Use the Supabase Secret key (sb_secret_...) or legacy service_role key, not the database password, anon key, or JWT secret.",
+    ].join(" ");
+  }
+
+  return `Storage upload failed: ${errorMessage}`;
+};
+
 const uploadToSupabase = async (options: {
   bucket: string;
   objectPath: string;
@@ -58,7 +70,7 @@ const uploadToSupabase = async (options: {
   cleanupTempFile(options.file);
 
   if (error) {
-    throw new AppError(`Storage upload failed: ${error.message}`, 500);
+    throw new AppError(toStorageErrorMessage(error.message), 500);
   }
 };
 
@@ -119,7 +131,7 @@ export const storePrivateTextFile = async (fileName: string, content: string) =>
   });
 
   if (error) {
-    throw new AppError(`Storage upload failed: ${error.message}`, 500);
+    throw new AppError(toStorageErrorMessage(error.message), 500);
   }
 
   return objectPath;

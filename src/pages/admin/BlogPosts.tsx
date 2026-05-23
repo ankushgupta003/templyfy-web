@@ -6,7 +6,7 @@ import { blogCategories } from "@shared/brand";
 import Button, { buttonStyles } from "../../components/Button";
 import EmptyState from "../../components/EmptyState";
 import Loader from "../../components/Loader";
-import { api, getApiErrorMessage, type BlogPost } from "../../lib/api";
+import { api, expectApiArray, getApiErrorMessage, type BlogPost } from "../../lib/api";
 import { formatDate, setPageMeta } from "../../lib/utils";
 
 export default function AdminBlogPosts() {
@@ -30,7 +30,7 @@ export default function AdminBlogPosts() {
           status: status || undefined,
         },
       });
-      return response.data;
+      return expectApiArray<BlogPost>(response.data, "/admin/blogs");
     },
   });
 

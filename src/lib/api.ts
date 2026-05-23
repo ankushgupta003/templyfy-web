@@ -169,6 +169,48 @@ export type StoreSettings = {
   };
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
+const endpointHint = (endpoint: string) =>
+  `Expected JSON from ${endpoint}. If this app is deployed with separate frontend and backend services, verify VITE_API_URL points to the backend /api URL.`;
+
+export const expectApiObject = <T>(value: unknown, endpoint: string) => {
+  if (typeof value === "string" && value.trim().startsWith("<")) {
+    throw new Error(`Received HTML instead of JSON from ${endpoint}. ${endpointHint(endpoint)}`);
+  }
+
+  if (!isRecord(value)) {
+    throw new Error(`Unexpected response shape from ${endpoint}. ${endpointHint(endpoint)}`);
+  }
+
+  return value as T;
+};
+
+export const expectApiArray = <T>(value: unknown, endpoint: string) => {
+  if (typeof value === "string" && value.trim().startsWith("<")) {
+    throw new Error(`Received HTML instead of JSON from ${endpoint}. ${endpointHint(endpoint)}`);
+  }
+
+  if (!Array.isArray(value)) {
+    throw new Error(`Expected a list from ${endpoint}. ${endpointHint(endpoint)}`);
+  }
+
+  return value as T[];
+};
+
+export const expectProductListResponse = (value: unknown, endpoint: string): ProductListResponse => {
+  const payload = expectApiObject<{ items?: unknown; total?: unknown }>(value, endpoint);
+
+  if (!Array.isArray(payload.items)) {
+    throw new Error(`Expected a product list from ${endpoint}. ${endpointHint(endpoint)}`);
+  }
+
+  return {
+    items: payload.items as Product[],
+    total: typeof payload.total === "number" ? payload.total : payload.items.length,
+  };
+};
+
 const browserOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:4000";
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL?.trim() || `${browserOrigin}/api`;

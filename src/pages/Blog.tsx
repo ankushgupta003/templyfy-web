@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { blogCategories } from "@shared/brand";
-import { api, type BlogPost } from "../lib/api";
+import { api, expectApiArray, type BlogPost } from "../lib/api";
 import { setPageMeta } from "../lib/utils";
 import BlogCard from "../components/BlogCard";
 import Button from "../components/Button";
@@ -28,7 +28,7 @@ export default function Blog() {
           category: searchParams.get("category") || undefined,
         },
       });
-      return response.data;
+      return expectApiArray<BlogPost>(response.data, "/blogs");
     },
   });
 
