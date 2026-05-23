@@ -5,9 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 dotenv.config();
 
-const tsxEntrypoint = require.resolve("tsx/dist/cli.mjs");
-
-const result = spawnSync(process.execPath, [tsxEntrypoint, "src/prisma/seed.ts"], {
+const result = spawnSync(process.execPath, ["--import", "tsx", "src/prisma/seed.ts"], {
   stdio: "inherit",
   env: process.env,
 });

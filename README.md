@@ -162,11 +162,16 @@ Render will deploy from GitHub, so this is the easiest starting point.
 
 1. Create a free project in Supabase.
 2. Go to the project dashboard.
-3. Open `Connect` and copy the Postgres connection string.
+3. Open `Connect` and copy the `Session pooler` Postgres connection string.
 4. Put that value into `DATABASE_URL`.
 5. Open `Storage`.
 6. Create a public bucket named `templyfy-public`.
 7. Create a private bucket named `templyfy-private`.
+
+Important:
+
+- Do not use the direct connection host `db.<project-ref>.supabase.co:5432` on free Render if it fails with `P1001`.
+- Supabase documents that direct connections use IPv6 by default, while the Session pooler supports IPv4 and IPv6.
 
 Use these values in `.env`:
 
