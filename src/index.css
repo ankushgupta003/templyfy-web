@@ -1,0 +1,112 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --bg: 248 250 252;
+    --ink: 8 17 31;
+    --slate: 51 65 85;
+    --electric: 37 99 235;
+    --emerald: 16 185 129;
+    --cyan: 6 182 212;
+  }
+
+  * {
+    border-color: rgb(226 232 240 / 1);
+  }
+
+  body {
+    @apply min-h-screen bg-cloud font-body text-slateText antialiased;
+    background-image: linear-gradient(180deg, rgba(8, 17, 31, 0.02), transparent 20%);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-ink;
+  }
+
+  a {
+    @apply transition-colors;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slateText shadow-sm outline-none transition focus:border-electric focus:ring-4 focus:ring-blue-100;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed opacity-70;
+  }
+}
+
+@layer components {
+  .container-shell {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-5 lg:px-6;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-slate-200 bg-white;
+  }
+
+  .dark-panel {
+    @apply rounded-2xl border border-slate-800 bg-ink text-white;
+  }
+
+  .section-gap {
+    @apply py-10 sm:py-12;
+  }
+
+  .hero-surface {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 32%),
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      #08111f;
+    background-size: 100% 100%, 28px 28px, 28px 28px;
+  }
+
+  .page-header {
+    @apply grid gap-4 border-b border-slate-200 pb-6 lg:grid-cols-[1fr_320px] lg:items-end;
+  }
+
+  .section-block {
+    @apply border border-slate-200 bg-white;
+  }
+
+  .section-block-dark {
+    @apply border border-slate-800 bg-ink text-white;
+  }
+
+  .section-block + .section-block {
+    @apply mt-4;
+  }
+
+  .data-list {
+    @apply divide-y divide-slate-200 border border-slate-200 bg-white;
+  }
+
+  .data-row {
+    @apply grid gap-4 px-4 py-4 sm:px-5;
+  }
+
+  .info-label {
+    @apply text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400;
+  }
+
+  .page-copy {
+    @apply text-sm leading-7 text-slate-600;
+  }
+
+  .section-title {
+    @apply text-[11px] font-semibold uppercase tracking-[0.26em] text-electric;
+  }
+}

@@ -1,0 +1,15 @@
+node_modules
+dist
+.vite
+.env
+.env.local
+.DS_Store
+coverage
+server/node_modules
+server/dist
+server/prisma/dev.db
+server/storage/uploads/*
+!server/storage/uploads/.gitkeep
+server/storage/private/*
+!server/storage/private/.gitkeep
+
