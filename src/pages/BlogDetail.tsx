@@ -58,17 +58,23 @@ export default function BlogDetail() {
     );
   }
 
+  const readingTime = estimateReadingTime(post.content);
+
   return (
     <div className="section-gap">
       <div className="container-shell space-y-8">
-        <div className="page-header">
-          <div className="space-y-4">
+        <div className="section-block overflow-hidden">
+          <img src={resolveAssetUrl(post.coverImage)} alt={post.title} className="aspect-[16/6] w-full object-cover" />
+        </div>
+
+        <div className="grid gap-8 border-b border-slate-200 pb-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-5">
             <div className="inline-flex rounded-full border border-slate-200 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-electric">
               {post.category}
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{post.title}</h1>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">{post.excerpt}</p>
+              <h1 className="max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.85rem]">{post.title}</h1>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">{post.excerpt}</p>
             </div>
             <div className="flex flex-wrap gap-4 text-sm text-slate-500">
               <span className="inline-flex items-center gap-2">
@@ -81,34 +87,49 @@ export default function BlogDetail() {
               </span>
               <span className="inline-flex items-center gap-2">
                 <Clock3 className="h-4 w-4 text-electric" />
-                {estimateReadingTime(post.content)} min read
+                {readingTime} min read
               </span>
             </div>
           </div>
-          <div className="section-block p-4">
+
+          <div className="section-block h-fit p-4 sm:p-5 lg:sticky lg:top-24">
             <div className="section-title">Article summary</div>
-            <div className="mt-3 space-y-3 text-sm text-slate-600">
+            <div className="mt-4 space-y-4 text-sm text-slate-600">
               <div>
                 <div className="info-label">Published</div>
                 <div className="mt-1 font-medium text-slate-700">{formatDate(post.publishedAt ?? post.createdAt)}</div>
               </div>
               <div>
-                <div className="info-label">Tags</div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <span key={tag} className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <div className="info-label">Reading time</div>
+                <div className="mt-1 font-medium text-slate-700">{readingTime} minutes</div>
+              </div>
+              <div>
+                <div className="info-label">Author</div>
+                <div className="mt-1 font-medium text-slate-700">{post.author}</div>
+              </div>
+              <div>
+                <div className="info-label">Category</div>
+                <div className="mt-1 font-medium text-slate-700">{post.category}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="section-block overflow-hidden">
-          <img src={resolveAssetUrl(post.coverImage)} alt={post.title} className="aspect-[16/6] w-full object-cover" />
-        </div>
+        {post.tags.length ? (
+          <div className="section-block p-4 sm:p-5">
+            <div className="section-title">Topics covered</div>
+            <div className="mt-3 flex flex-wrap gap-2.5">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
           <article className="section-block p-5 sm:p-6">
