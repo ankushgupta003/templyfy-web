@@ -195,9 +195,9 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="section-gap">
+    <div className="section-gap pb-28 sm:pb-32 lg:pb-12">
       <div className="container-shell space-y-10">
-        <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-start">
           <div className="space-y-4">
             <div className="panel overflow-hidden">
               <img
@@ -224,70 +224,72 @@ export default function ProductDetail() {
               <p className="text-[15px] leading-7 text-slate-600">{product.description}</p>
             </div>
 
-            <div className="panel p-5 sm:p-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <div className="text-3xl font-bold text-ink sm:text-[2rem]">{formatCurrency(product.price)}</div>
-                  {product.compareAtPrice ? (
-                    <div className="mt-2 text-sm text-slate-400 line-through">
-                      {formatCurrency(product.compareAtPrice)}
-                    </div>
-                  ) : null}
-                </div>
-                <div className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                  Premium digital resource
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {[
-                  { icon: FileCode2, label: "File type", value: product.fileType },
-                  { icon: Sparkles, label: "Version", value: product.version },
-                  { icon: Clock3, label: "Last updated", value: formatDate(product.updatedAt) },
-                  { icon: Laptop2, label: "Compatibility", value: product.compatibility },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-[20px] bg-slate-50 p-4">
-                    <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                      <item.icon className="h-4 w-4 text-electric" />
-                      {item.label}
-                    </div>
-                    <div className="mt-2 text-sm leading-6 text-ink">{item.value}</div>
+            <div className="space-y-3">
+              <div className="panel p-5 shadow-panel sm:p-6 lg:sticky lg:top-24">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <div className="text-3xl font-bold text-ink sm:text-[2rem]">{formatCurrency(product.price)}</div>
+                    {product.compareAtPrice ? (
+                      <div className="mt-2 text-sm text-slate-400 line-through">
+                        {formatCurrency(product.compareAtPrice)}
+                      </div>
+                    ) : null}
                   </div>
-                ))}
-              </div>
-
-              <div className="mt-5 rounded-[20px] border border-emerald-100 bg-emerald-50 px-4 py-3.5 text-sm text-emerald-800">
-                After successful payment, the file will be sent to your email.
-              </div>
-
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" onClick={openCheckoutModal}>
-                  Buy Now
-                </Button>
-                <Link to="/products" className={buttonStyles({ variant: "secondary", size: "lg" })}>
-                  Browse more templates
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="panel p-4 sm:p-5">
-                <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
-                  <Download className="h-5 w-5 text-electric" />
-                  Instant email delivery
+                  <div className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                    Premium digital resource
+                  </div>
                 </div>
-                <p className="mt-2.5 text-sm leading-6 text-slate-600">
-                  A secure download link is emailed after payment verification so the file stays protected.
-                </p>
-              </div>
-              <div className="panel p-4 sm:p-5">
-                <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
-                  <ShieldCheck className="h-5 w-5 text-emerald" />
-                  Verified payment flow
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {[
+                    { icon: FileCode2, label: "File type", value: product.fileType },
+                    { icon: Sparkles, label: "Version", value: product.version },
+                    { icon: Clock3, label: "Last updated", value: formatDate(product.updatedAt) },
+                    { icon: Laptop2, label: "Compatibility", value: product.compatibility },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-[20px] bg-slate-50 p-4">
+                      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                        <item.icon className="h-4 w-4 text-electric" />
+                        {item.label}
+                      </div>
+                      <div className="mt-2 text-sm leading-6 text-ink">{item.value}</div>
+                    </div>
+                  ))}
                 </div>
-                <p className="mt-2.5 text-sm leading-6 text-slate-600">
-                  Checkout happens with Razorpay and the backend verifies payment signatures before order completion.
-                </p>
+
+                <div className="mt-5 rounded-[20px] border border-emerald-100 bg-emerald-50 px-4 py-3.5 text-sm text-emerald-800">
+                  After successful payment, the file will be sent to your email.
+                </div>
+
+                <div className="mt-5 hidden flex-col gap-3 sm:flex-row lg:flex">
+                  <Button size="lg" onClick={openCheckoutModal}>
+                    Buy Now
+                  </Button>
+                  <Link to="/products" className={buttonStyles({ variant: "secondary", size: "lg" })}>
+                    Browse more templates
+                  </Link>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="panel p-4 sm:p-5">
+                  <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+                    <Download className="h-5 w-5 text-electric" />
+                    Instant email delivery
+                  </div>
+                  <p className="mt-2.5 text-sm leading-6 text-slate-600">
+                    A secure download link is emailed after payment verification so the file stays protected.
+                  </p>
+                </div>
+                <div className="panel p-4 sm:p-5">
+                  <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+                    <ShieldCheck className="h-5 w-5 text-emerald" />
+                    Verified payment flow
+                  </div>
+                  <p className="mt-2.5 text-sm leading-6 text-slate-600">
+                    Checkout happens with Razorpay and the backend verifies payment signatures before order completion.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -384,6 +386,23 @@ export default function ProductDetail() {
               description="More products in this category will appear here as the marketplace grows."
             />
           )}
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 shadow-[0_-20px_40px_rgba(8,17,31,0.12)] backdrop-blur lg:hidden">
+        <div className="container-shell flex items-center gap-3 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Instant delivery</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <div className="text-2xl font-bold text-ink">{formatCurrency(product.price)}</div>
+              {product.compareAtPrice ? (
+                <div className="text-sm text-slate-400 line-through">{formatCurrency(product.compareAtPrice)}</div>
+              ) : null}
+            </div>
+          </div>
+          <Button size="lg" className="min-w-[8.75rem] shrink-0" onClick={openCheckoutModal}>
+            Buy Now
+          </Button>
         </div>
       </div>
 
