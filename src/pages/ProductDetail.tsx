@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { type UIEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -41,7 +41,8 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { isReady, openCheckout } = useRazorpay();
   const checkoutOpen = searchParams.get("checkout") === "1";
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const mobileCarouselRef = useRef<HTMLDivElement | null>(null);
 
   const productQuery = useQuery({
     queryKey: ["product", slug],
@@ -69,8 +70,30 @@ export default function ProductDetail() {
   }, [product]);
 
   useEffect(() => {
-    setSelectedImage(productImages[0] ?? null);
+    setSelectedImageIndex(0);
   }, [productImages]);
+
+  const scrollMobileCarouselTo = (index: number) => {
+    setSelectedImageIndex(index);
+
+    const carousel = mobileCarouselRef.current;
+    const slide = carousel?.children[index] as HTMLElement | undefined;
+    slide?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  };
+
+  const handleMobileCarouselScroll = (event: UIEvent<HTMLDivElement>) => {
+    const { scrollLeft, clientWidth } = event.currentTarget;
+
+    if (!clientWidth) {
+      return;
+    }
+
+    const nextIndex = Math.round(scrollLeft / clientWidth);
+
+    if (nextIndex !== selectedImageIndex) {
+      setSelectedImageIndex(Math.max(0, Math.min(productImages.length - 1, nextIndex)));
+    }
+  };
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -199,7 +222,7 @@ export default function ProductDetail() {
     );
   }
 
-  const activeImage = selectedImage ?? productImages[0] ?? product.thumbnailUrl;
+  const activeImage = productImages[selectedImageIndex] ?? product.thumbnailUrl;
 
   return (
     <div className="section-gap pb-28 sm:pb-32 lg:pb-12">
@@ -216,20 +239,55 @@ export default function ProductDetail() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[88px_minmax(0,1fr)_minmax(340px,380px)] lg:items-start lg:gap-8 xl:grid-cols-[96px_minmax(0,1fr)_400px] xl:gap-10">
-            <div className="order-2 grid gap-4 sm:grid-cols-3 lg:order-1 lg:grid-cols-1">
-              {productImages.slice(0, 4).map((image, index) => (
+            <div className="order-1 lg:hidden">
+              <div
+                ref={mobileCarouselRef}
+                onScroll={handleMobileCarouselScroll}
+                className="flex snap-x snap-mandatory touch-pan-x overflow-x-auto rounded-[24px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {productImages.map((image, index) => (
+                  <div key={image} className="w-full shrink-0 snap-center">
+                    <img
+                      src={resolveAssetUrl(image)}
+                      alt={`${product.title} preview ${index + 1}`}
+                      className="aspect-[16/11] w-full rounded-[24px] object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+              {productImages.length > 1 ? (
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  {productImages.map((image, index) => (
+                    <button
+                      key={image}
+                      type="button"
+                      onClick={() => scrollMobileCarouselTo(index)}
+                      className={cn(
+                        "h-2.5 rounded-full transition-all duration-200",
+                        index === selectedImageIndex ? "w-6 bg-electric" : "w-2.5 bg-slate-300",
+                      )}
+                      aria-label={`Go to image ${index + 1}`}
+                      aria-pressed={index === selectedImageIndex}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="order-2 hidden gap-4 lg:grid lg:grid-cols-1">
+              {productImages.map((image, index) => (
                 <button
                   key={image}
                   type="button"
-                  onClick={() => setSelectedImage(image)}
+                  onClick={() => setSelectedImageIndex(index)}
                   className={cn(
                     "overflow-hidden rounded-[22px] border bg-white transition duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100",
-                    image === activeImage
+                    index === selectedImageIndex
                       ? "border-electric shadow-[0_0_0_1px_rgba(37,99,235,0.18)]"
                       : "border-slate-200 hover:border-slate-300",
                   )}
                   aria-label={`Preview image ${index + 1} for ${product.title}`}
-                  aria-pressed={image === activeImage}
+                  aria-pressed={index === selectedImageIndex}
                 >
                   <img
                     src={resolveAssetUrl(image)}
@@ -240,7 +298,7 @@ export default function ProductDetail() {
               ))}
             </div>
 
-            <div className="order-1 lg:order-2">
+            <div className="order-2 hidden lg:block lg:order-2">
               <div className="overflow-hidden rounded-[24px] bg-slate-50 lg:rounded-[30px]">
                 <img
                   src={resolveAssetUrl(activeImage)}

@@ -1,7 +1,6 @@
 import { Menu, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { brand } from "@shared/brand";
 import Logo from "./Logo";
 import { buttonStyles } from "./Button";
 import { cn } from "../lib/utils";
@@ -19,7 +18,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="container-shell flex h-16 items-center justify-between gap-5">
-        <Logo light />
+        <Logo className="min-w-0" />
         <nav className="hidden items-center gap-5 md:flex">
           {navLinks.map((link) => (
             <NavLink
