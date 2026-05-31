@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ import {
   type Product,
 } from "../lib/api";
 import { checkoutSchema } from "../lib/validation";
-import { formatCurrency, formatDate, setPageMeta } from "../lib/utils";
+import { cn, formatCurrency, formatDate, setPageMeta } from "../lib/utils";
 import { useRazorpay } from "../hooks/useRazorpay";
 import Loader from "../components/Loader";
 import ProductCard from "../components/ProductCard";
@@ -41,6 +41,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { isReady, openCheckout } = useRazorpay();
   const checkoutOpen = searchParams.get("checkout") === "1";
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const productQuery = useQuery({
     queryKey: ["product", slug],
@@ -64,8 +65,12 @@ export default function ProductDetail() {
       return [];
     }
 
-    return [product.thumbnailUrl, ...(product.galleryImages ?? [])];
+    return Array.from(new Set([product.thumbnailUrl, ...(product.galleryImages ?? [])]));
   }, [product]);
+
+  useEffect(() => {
+    setSelectedImage(productImages[0] ?? null);
+  }, [productImages]);
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -194,105 +199,172 @@ export default function ProductDetail() {
     );
   }
 
+  const activeImage = selectedImage ?? productImages[0] ?? product.thumbnailUrl;
+
   return (
     <div className="section-gap pb-28 sm:pb-32 lg:pb-12">
-      <div className="container-shell space-y-10">
-        <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-start">
-          <div className="space-y-4">
-            <div className="panel overflow-hidden">
-              <img
-                src={resolveAssetUrl(productImages[0] ?? product.thumbnailUrl)}
-                alt={product.title}
-                className="aspect-[16/11] w-full object-cover"
-              />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {productImages.slice(0, 3).map((image) => (
-                <div key={image} className="panel overflow-hidden">
-                  <img src={resolveAssetUrl(image)} alt={product.title} className="aspect-[4/3] w-full object-cover" />
-                </div>
-              ))}
-            </div>
+      <div className="mx-auto w-full max-w-[1480px] space-y-10 px-4 sm:px-5 lg:px-8 xl:px-10">
+        <div className="space-y-6 lg:space-y-8">
+          <div className="hidden items-center gap-2 text-sm text-slate-400 lg:flex">
+            <Link to="/products" className="hover:text-electric">
+              Products
+            </Link>
+            <span>/</span>
+            <span>{product.category}</span>
+            <span>/</span>
+            <span className="text-slate-700">{product.title}</span>
           </div>
 
-          <div className="space-y-5">
-            <div className="space-y-3">
-              <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-electric">
-                {product.category}
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.8rem]">{product.title}</h1>
-              <p className="text-[15px] leading-7 text-slate-600">{product.description}</p>
+          <div className="grid gap-6 lg:grid-cols-[88px_minmax(0,1fr)_minmax(340px,380px)] lg:items-start lg:gap-8 xl:grid-cols-[96px_minmax(0,1fr)_400px] xl:gap-10">
+            <div className="order-2 grid gap-4 sm:grid-cols-3 lg:order-1 lg:grid-cols-1">
+              {productImages.slice(0, 4).map((image, index) => (
+                <button
+                  key={image}
+                  type="button"
+                  onClick={() => setSelectedImage(image)}
+                  className={cn(
+                    "overflow-hidden rounded-[22px] border bg-white transition duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100",
+                    image === activeImage
+                      ? "border-electric shadow-[0_0_0_1px_rgba(37,99,235,0.18)]"
+                      : "border-slate-200 hover:border-slate-300",
+                  )}
+                  aria-label={`Preview image ${index + 1} for ${product.title}`}
+                  aria-pressed={image === activeImage}
+                >
+                  <img
+                    src={resolveAssetUrl(image)}
+                    alt={product.title}
+                    className="aspect-[4/3] w-full object-cover lg:aspect-[5/6]"
+                  />
+                </button>
+              ))}
             </div>
 
-            <div className="space-y-3">
-              <div className="panel p-5 shadow-panel sm:p-6 lg:sticky lg:top-24">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <div className="text-3xl font-bold text-ink sm:text-[2rem]">{formatCurrency(product.price)}</div>
-                    {product.compareAtPrice ? (
-                      <div className="mt-2 text-sm text-slate-400 line-through">
-                        {formatCurrency(product.compareAtPrice)}
-                      </div>
-                    ) : null}
+            <div className="order-1 lg:order-2">
+              <div className="overflow-hidden rounded-[24px] bg-slate-50 lg:rounded-[30px]">
+                <img
+                  src={resolveAssetUrl(activeImage)}
+                  alt={product.title}
+                  className="aspect-[16/11] w-full object-cover lg:aspect-[6/5] xl:aspect-[5/4]"
+                />
+              </div>
+            </div>
+
+            <div className="order-3 lg:sticky lg:top-24">
+              <div className="space-y-6 lg:space-y-8">
+                <div className="flex flex-wrap gap-2">
+                  <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-electric">
+                    {product.category}
                   </div>
-                  <div className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                    Premium digital resource
+                  <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600">
+                    {product.fileType}
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.85rem]">{product.title}</h1>
+                  <p className="mt-3 text-[15px] leading-7 text-slate-600">{product.shortDescription}</p>
+                </div>
+
+                <div className="border-y border-slate-200 py-5">
+                  <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+                    <div className="text-3xl font-bold text-ink sm:text-[2rem]">{formatCurrency(product.price)}</div>
+                    {product.compareAtPrice ? (
+                      <div className="pb-1 text-base text-slate-400 line-through">{formatCurrency(product.compareAtPrice)}</div>
+                    ) : null}
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
+                      Premium digital resource
+                    </span>
+                    <span>Secure download delivered by email after payment verification.</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
                   {[
                     { icon: FileCode2, label: "File type", value: product.fileType },
                     { icon: Sparkles, label: "Version", value: product.version },
                     { icon: Clock3, label: "Last updated", value: formatDate(product.updatedAt) },
                     { icon: Laptop2, label: "Compatibility", value: product.compatibility },
                   ].map((item) => (
-                    <div key={item.label} className="rounded-[20px] bg-slate-50 p-4">
-                      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    <div key={item.label} className="flex items-start justify-between gap-4 border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
+                      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                         <item.icon className="h-4 w-4 text-electric" />
                         {item.label}
                       </div>
-                      <div className="mt-2 text-sm leading-6 text-ink">{item.value}</div>
+                      <div className="max-w-[14rem] text-right text-sm leading-6 text-ink">{item.value}</div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 rounded-[20px] border border-emerald-100 bg-emerald-50 px-4 py-3.5 text-sm text-emerald-800">
-                  After successful payment, the file will be sent to your email.
+                <div className="rounded-[20px] border border-emerald-100 bg-emerald-50/80 px-4 py-3.5 text-sm leading-6 text-emerald-800">
+                  After successful payment, your secure file link is sent to your email so the download stays protected.
                 </div>
 
-                <div className="mt-5 hidden flex-col gap-3 sm:flex-row lg:flex">
-                  <Button size="lg" onClick={openCheckoutModal}>
+                <div className="hidden gap-3 lg:flex lg:flex-col">
+                  <Button size="lg" className="w-full justify-center" onClick={openCheckoutModal}>
                     Buy Now
                   </Button>
-                  <Link to="/products" className={buttonStyles({ variant: "secondary", size: "lg" })}>
+                  <Link
+                    to="/products"
+                    className={buttonStyles({ variant: "secondary", size: "lg", className: "w-full justify-center" })}
+                  >
                     Browse more templates
                   </Link>
                 </div>
-              </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="panel p-4 sm:p-5">
-                  <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
-                    <Download className="h-5 w-5 text-electric" />
-                    Instant email delivery
+                <div className="hidden gap-4 border-t border-slate-200 pt-5 lg:grid">
+                  <div className="flex items-start gap-3 text-sm leading-6 text-slate-600">
+                    <Download className="mt-0.5 h-5 w-5 text-electric" />
+                    <span>Instant email delivery once Razorpay payment verification completes.</span>
                   </div>
-                  <p className="mt-2.5 text-sm leading-6 text-slate-600">
-                    A secure download link is emailed after payment verification so the file stays protected.
-                  </p>
-                </div>
-                <div className="panel p-4 sm:p-5">
-                  <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
-                    <ShieldCheck className="h-5 w-5 text-emerald" />
-                    Verified payment flow
+                  <div className="flex items-start gap-3 text-sm leading-6 text-slate-600">
+                    <ShieldCheck className="mt-0.5 h-5 w-5 text-emerald" />
+                    <span>Secure payment flow with backend signature checks before order completion.</span>
                   </div>
-                  <p className="mt-2.5 text-sm leading-6 text-slate-600">
-                    Checkout happens with Razorpay and the backend verifies payment signatures before order completion.
-                  </p>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
+          <div className="panel p-4 sm:p-5">
+            <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <Download className="h-5 w-5 text-electric" />
+              Instant email delivery
+            </div>
+            <p className="mt-2.5 text-sm leading-6 text-slate-600">
+              A secure download link is emailed after payment verification so the file stays protected.
+            </p>
+          </div>
+          <div className="panel p-4 sm:p-5">
+            <div className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <ShieldCheck className="h-5 w-5 text-emerald" />
+              Verified payment flow
+            </div>
+            <p className="mt-2.5 text-sm leading-6 text-slate-600">
+              Checkout happens with Razorpay and the backend verifies payment signatures before order completion.
+            </p>
+          </div>
+        </div>
+
+        <div className="hidden items-center gap-8 border-b border-slate-200 px-2 lg:flex">
+          <a href="#product-details" className="border-b-2 border-ink pb-3 text-lg font-semibold text-ink">
+            Product details
+          </a>
+          <a href="#whats-included" className="pb-3 text-lg text-slate-500 hover:text-ink">
+            What's included
+          </a>
+          <a href="#product-faq" className="pb-3 text-lg text-slate-500 hover:text-ink">
+            FAQ
+          </a>
+        </div>
+
+        <div id="product-details" className="panel scroll-mt-24 p-5 sm:p-6">
+          <h2 className="text-xl font-bold sm:text-2xl">Product details</h2>
+          <p className="mt-4 text-sm leading-7 text-slate-700">{product.description}</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -307,7 +379,7 @@ export default function ProductDetail() {
               ))}
             </div>
           </div>
-          <div className="panel p-5 sm:p-6">
+          <div id="whats-included" className="panel scroll-mt-24 p-5 sm:p-6">
             <h2 className="text-xl font-bold sm:text-2xl">What's included</h2>
             <div className="mt-4 space-y-3">
               {product.includedFiles.map((item) => (
@@ -339,7 +411,7 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        <div className="panel p-5 sm:p-6">
+        <div id="product-faq" className="panel scroll-mt-24 p-5 sm:p-6">
           <h2 className="text-xl font-bold sm:text-2xl">Product FAQ</h2>
           <div className="mt-4 grid gap-3 lg:grid-cols-3">
             {[
